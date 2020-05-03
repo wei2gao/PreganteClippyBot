@@ -48,7 +48,7 @@ async def on_message(message):
         curr_timestamp = time.time()
         days_since_mention = int((curr_timestamp - last_mention_timestamp))
         last_mention_timestamp = curr_timestamp
-        response = "It has been {n:d} seconds since pregnant clippy was last mentioned".format(n=days_since_mention)        
+        response = "Pregnant clippy was last mentioned {n:d}} seconds before now".format(n=days_since_mention)        
         await message.channel.send(response)
 
 client.run(TOKEN)
