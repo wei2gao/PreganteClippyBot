@@ -1,6 +1,7 @@
 # bot.py
 import os
 import time
+import string
 import discord
 from dotenv import load_dotenv
 
@@ -11,6 +12,21 @@ GUILD = os.getenv('DISCORD_GUILD')
 client = discord.Client()
 global last_mention_timestamp
 last_mention_timestamp = time.time()
+
+triggerwords = []
+
+file = open("prangent.txt","r")
+for line in file:
+    triggerwords.append(line.rstrip())
+
+file.close()
+print(triggerwords)
+
+def list_find(word):
+    for w in triggerwords:
+        if w in word:
+            return True
+    return False
 
 @client.event
 async def on_ready():
@@ -27,8 +43,8 @@ async def on_message(message):
     global last_mention_timestamp
     if message.author == client.user:
         return
-
-    if message.content.lower().replace(" ","").find("pregnantclippy") >= 0:
+    cleaned_msg = message.content.lower().replace(" ","")
+    if list_find(cleaned_msg):
         curr_timestamp = time.time()
         days_since_mention = int((curr_timestamp - last_mention_timestamp))
         last_mention_timestamp = curr_timestamp
