@@ -59,8 +59,7 @@ async def on_ready():
         f'{guild.name}(id: {guild.id})'
     )
 
-@client.event
-async def on_message(message):
+def handle_mention(message):
     global last_mention_timestamp
     if message.author == client.user:
         return
@@ -75,7 +74,19 @@ async def on_message(message):
         last_mention_timestamp = curr_timestamp
         save_streak()
         response = "Pregnant clippy was last mentioned {n:d} seconds before now".format(n=days_since_mention)        
+        return response
+
+@client.event
+async def on_message(message):
+    response = handle_mention(message)
+    if response:
         await message.channel.send(response)
+
+@client.event
+async def on_message_edit(message_before, message_after):
+    response = handle_mention(message_after)
+    if response:
+        await message_after.channel.send(response)
 
 @client.event
 async def on_disconnect():
