@@ -1,5 +1,6 @@
 # bot.py
 import os
+from os import path
 import time
 import string
 import discord
@@ -15,6 +16,22 @@ last_mention_timestamp = time.time()
 
 triggerwords = []
 
+streak_filename = ".pretnetclippy"
+
+def save_streak():
+    global last_mention_timestamp
+    print(last_mention_timestamp)
+    with open(streak_filename, 'w') as savefile:
+        savefile.write(str(last_mention_timestamp))
+        
+def load_streak():
+    global last_mention_timestamp
+    with open(streak_filename, 'r') as savefile:
+        lines = savefile.readlines()
+        for line in lines:
+            last_mention_timestamp = float(line.rstrip())
+
+    
 file = open("prangent.txt","r")
 for line in file:
     triggerwords.append(line.rstrip())
@@ -31,7 +48,11 @@ def list_find(word):
 @client.event
 async def on_ready():
     global last_mention_timestamp
-    last_mention_timestamp = time.time()
+    if path.exists(streak_filename):
+        load_streak()
+    else:
+        last_mention_timestamp = time.time()
+
     guild = discord.utils.find(lambda g: g.name == GUILD, client.guilds)
     print(
         f'{client.user} is connected to the following guild:\n'
@@ -46,9 +67,18 @@ async def on_message(message):
     cleaned_msg = message.content.lower().replace(" ","")
     if list_find(cleaned_msg):
         curr_timestamp = time.time()
+        print("current")
+        print(curr_timestamp)
+        print("last")
+        print(last_mention_timestamp)
         days_since_mention = int((curr_timestamp - last_mention_timestamp))
         last_mention_timestamp = curr_timestamp
-        response = "Pregnant clippy was last mentioned {n:d}} seconds before now".format(n=days_since_mention)        
+        save_streak()
+        response = "Pregnant clippy was last mentioned {n:d} seconds before now".format(n=days_since_mention)        
         await message.channel.send(response)
+
+@client.event
+async def on_disconnect():
+    save_streak()
 
 client.run(TOKEN)
