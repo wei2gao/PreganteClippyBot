@@ -33,3 +33,6 @@ pregernetclippy
 prengtclippy
 prognantclippy
 pretnetclippy
+pregoclippy
+preggoclippy
+pregclip

@@ -60,21 +60,39 @@ async def on_ready():
         f'{guild.name}(id: {guild.id})'
     )
 
+def convert_seconds(seconds):
+    sec = seconds
+    # return a string saying "x days, x minutes,", etc.
+    sec_per_day = 60*60*24
+    sec_per_hour = 60*60
+    sec_per_minute = 60
+
+    days = sec // sec_per_day
+    sec = sec - days*sec_per_day
+    hours = sec // sec_per_hour
+    sec = sec - hours*sec_per_hour
+    minutes = sec // sec_per_minute
+    sec = sec - minutes*sec_per_minute
+    time_str = "{n1:d} days, {n2:d} hours, {n3:d} minutes, and {n4:d} seconds".format(n1=days,n2=hours,n3=minutes,n4=sec)
+    return time_str
+
 def handle_mention(message):
     global last_mention_timestamp
     if message.author == client.user:
         return
-    cleaned_msg = message.content.lower().replace(" ","")
-    if list_find(cleaned_msg):
+    cleaned_msg = message.content.lower().replace(" ","") 
+    emoji_mention = (":clippy:" in cleaned_msg or ":clippyplane:" in cleaned_msg) and "🤰" in cleaned_msg
+
+    if list_find(cleaned_msg) or emoji_mention:
         curr_timestamp = time.time()
         print("current")
         print(curr_timestamp)
         print("last")
         print(last_mention_timestamp)
-        days_since_mention = int((curr_timestamp - last_mention_timestamp))
+        sec_since_mention = int((curr_timestamp - last_mention_timestamp))
         last_mention_timestamp = curr_timestamp
         save_streak()
-        response = "Pregnant clippy was last mentioned {n:d} seconds before now".format(n=days_since_mention)        
+        response = "Pregnant clippy was last mentioned {n:s} before now".format(n=convert_seconds(sec_since_mention))        
         return response
 
 @client.event
