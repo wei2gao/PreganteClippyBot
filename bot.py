@@ -4,6 +4,7 @@ from os import path
 import time
 import string
 import discord
+from discord.utils import get
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -81,6 +82,19 @@ async def on_message(message):
     response = handle_mention(message)
     if response:
         await message.channel.send(response)
+    else:
+        # See if the message contains :clippy: or :clippyplane:
+        if message.author == client.user:
+            return
+        cleaned_msg = message.content
+        if ":clippy:" in cleaned_msg:
+            emoji = client.get_emoji(709226943135875073)
+            await message.add_reaction( emoji)
+        elif ":clippyplane:" in cleaned_msg:
+            emoji = client.get_emoji(709227225102286889)
+            await message.add_reaction(emoji)
+
+        
 
 @client.event
 async def on_message_edit(message_before, message_after):
